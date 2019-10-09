@@ -61,6 +61,10 @@ export class AppComponent implements OnInit, OnDestroy {
   private fetchPosts() {
     this.isFetching = true;
   }
+  onHandleError() {
+    this.isFetching = false;
+    this.error = null;
+  }
 
   ngOnDestroy() {
     this.errorSub.unsubscribe();
