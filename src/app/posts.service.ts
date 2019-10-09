@@ -38,4 +38,9 @@ export class PostsService {
         }),
       );
   }
+  deletePosts() {
+    return this.http.delete(
+      'https://ng-complete-guide-30f1e.firebaseio.com/posts.json',
+    );
+  }
 }
