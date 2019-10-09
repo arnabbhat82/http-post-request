@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Post } from './post.model';
+import { PostsService } from './posts.service';
 
 @Component({
   selector: 'app-root',
@@ -12,27 +13,27 @@ export class AppComponent implements OnInit {
   loadedPosts: Post[] = [];
   isFetching = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private postsService: PostsService) {}
 
   ngOnInit() {
-    this.fetchPosts();
+    this.isFetching = true;
+    this.postsService.fetchPosts().subscribe(posts => {
+      this.isFetching = false;
+      this.loadedPosts = posts;
+    });
   }
 
   onCreatePost(postData: Post) {
-    // console.log(postData);
-    // this.http.post('https://ng-complete-guide-30f1e.firebaseio.com/', postData);
-    this.http
-      .post<{ name: string }>(
-        'https://ng-complete-guide-30f1e.firebaseio.com/posts.json',
-        postData,
-      )
-      .subscribe(responseData => {
-        console.log(responseData);
-      });
+    this.postsService.createAndStorePost(postData.title, postData.content);
   }
 
   onFetchPosts() {
     // Send Http request
+    this.isFetching = true;
+    this.postsService.fetchPosts().subscribe(posts => {
+      this.isFetching = false;
+      this.loadedPosts = posts;
+    });
   }
 
   onClearPosts() {
@@ -40,25 +41,5 @@ export class AppComponent implements OnInit {
   }
   private fetchPosts() {
     this.isFetching = true;
-    this.http
-      .get<{ [key: string]: Post }>(
-        'https://ng-complete-guide-30f1e.firebaseio.com/posts.json',
-      )
-      .pipe(
-        map(responseData => {
-          const postArray: Post[] = [];
-          for (const key in responseData) {
-            if (responseData.hasOwnProperty(key)) {
-              postArray.push({ ...responseData[key], id: key });
-            }
-          }
-          return postArray;
-        }),
-      )
-      .subscribe(posts => {
-        this.isFetching = false;
-        this.loadedPosts = posts;
-        // console.log(this.loadedPosts);
-      });
   }
 }
