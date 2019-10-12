@@ -18,10 +18,13 @@ export class PostsService {
       .post<{ name: string }>(
         'https://ng-complete-guide-30f1e.firebaseio.com/posts.json',
         postData,
+        {
+          observe: 'response',
+        },
       )
       .subscribe(
         responseData => {
-          console.log(responseData);
+          console.log(responseData.body);
         },
         error => {
           this.error.next(error.message);
